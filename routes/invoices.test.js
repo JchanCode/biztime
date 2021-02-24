@@ -65,7 +65,6 @@ describe("GET /invoices/:id", ()=>{
 describe("POST /invoices", ()=>{
   test("post an invoice to /invoices", async()=>{
     const res = await request(app).post("/invoices").send({comp_code:"orange", amt:1337})
-    console.log(res)
     expect(res.statusCode).toBe(201)
     expect(res.body).toEqual({invoice:{    "add_date": "2021-02-24T05:00:00.000Z",
                                            "amt": 1337,
@@ -80,14 +79,14 @@ describe("POST /invoices", ()=>{
 
 describe("PATCH /invoices/:id", ()=>{
   test("Update a single invoice", async()=>{
-    const res = await request(app).patch(`/invoices/${testInvoice.id}`).send({amt:999999})
+    const res = await request(app).patch(`/invoices/${testInvoice.id}`).send({amt:1,paid:true})
     expect(res.statusCode).toBe(200)
     expect(res.body).toEqual({invoice:{    "add_date": "2021-02-24T05:00:00.000Z",
-                                           "amt": 999999,
+                                           "amt": 1,
                                            "comp_code": "orange",
                                            "id": expect.any(Number), 
-                                           "paid": false,
-                                           "paid_date": null,      
+                                           "paid": true,
+                                           "paid_date": expect.any(String),      
     }})
 })})
 
