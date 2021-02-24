@@ -1,7 +1,8 @@
 const express = require("express")
 const router = new express.Router()
 const ExpressError = require("../expressError")
-const db = require("../db")
+const db = require("../db");
+const { default: slugify } = require("slugify");
 
 
 
@@ -44,9 +45,10 @@ POST /companies adds a single company
  */ 
 router.post("/", async(req, res, next)=>{
   try {
-    const {code, name, description} = req.body;
+    const {name, description} = req.body;
+    const code = slugify(name,{lower: TRUE})
     const results = await db.query(`INSERT INTO companies (code, name, description) VALUES ($1,$2,$3) RETURNING code, name, description`,[code, name, description]);
-    return res.json({company: results.rows[0]});
+    return res.status(201).json({company: results.rows[0]});
   } catch (error) {
     return next(error);
   };

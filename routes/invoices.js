@@ -26,9 +26,9 @@ router.get("/:id", async(req, res, next)=>{
     const {id} = req.params;
     const results = await db.query(`SELECT * FROM invoices WHERE id=$1`,[id])
     if (results.rows.length === 0 ) {
-      throw new ExpressError(`Can't find invoices with id:${id}`)
+      throw new ExpressError(`Can't find invoices with id:${id}`,404)
     }
-    return res.json({invoice: results.rows})
+    return res.json({invoice: results.rows[0]})
   } catch (error) {
     return next(error)
   }
@@ -41,8 +41,9 @@ POST /invoices adds an invoice
 router.post("/", async(req, res, next)=>{
   try {
     const {comp_code, amt} = req.body;
-    const results = await db.query(`INSERT INTO invoices (comp_code, amt) VALUES ($1,$2) RETURNING *`,[comp_code, amt]);
-    return res.json({invoice: results.rows})
+    const results = await db.query(`INSERT INTO invoices (comp_code, amt)
+                                    VALUES ($1,$2) RETURNING *`,[comp_code, amt]);
+    return res.status(201).json({invoice: results.rows[0]})
   } catch (error) {
     return next(error)
   }
@@ -60,7 +61,7 @@ router.patch("/:id", async(req, res, next)=>{
     if (results.rows.length === 0) {
       throw new ExpressError(`Can't find invoice with id:${id}`, 404)
     }
-    return res.json({invoice: results.rows})
+    return res.json({invoice: results.rows[0]})
   } catch (error) {
     return next(error)
   };
@@ -73,7 +74,7 @@ DELETE /invoices/:id  DELETE an invoice
 router.delete("/:id", async(req, res, next)=>{
   try {
     const {id} = req.params;
-    const invoiceCheck = await db.query(`SELECT * FROM invoices WHERE code=$1`,[id])
+    const invoiceCheck = await db.query(`SELECT * FROM invoices WHERE id=$1`,[id])
     if ( invoiceCheck.rows.length === 0) {
       throw new ExpressError(`Can't find invoice with id:${id}`, 404)
     };
